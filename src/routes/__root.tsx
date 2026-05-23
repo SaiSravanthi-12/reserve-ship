@@ -72,14 +72,18 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
     meta: [
       { charSet: "utf-8" },
       { name: "viewport", content: "width=device-width, initial-scale=1" },
-      { title: "Lovable App" },
-      { name: "description", content: "Lovable Generated Project" },
+      { title: "Allo Inventory" },
+      { name: "description", content: "Reserve & Ship manages product inventory by temporarily holding items for customers during checkout." },
       { name: "author", content: "Lovable" },
-      { property: "og:title", content: "Lovable App" },
-      { property: "og:description", content: "Lovable Generated Project" },
+      { property: "og:title", content: "Allo Inventory" },
+      { property: "og:description", content: "Reserve & Ship manages product inventory by temporarily holding items for customers during checkout." },
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary" },
       { name: "twitter:site", content: "@Lovable" },
+      { name: "twitter:title", content: "Allo Inventory" },
+      { name: "twitter:description", content: "Reserve & Ship manages product inventory by temporarily holding items for customers during checkout." },
+      { property: "og:image", content: "https://pub-bb2e103a32db4e198524a2e9ed8f35b4.r2.dev/a2d78609-5b4a-455f-a406-b300bd1a74e4/id-preview-6b2cb7a4--39708a3f-1bb9-43cc-ac75-202989847b5c.lovable.app-1779555584603.png" },
+      { name: "twitter:image", content: "https://pub-bb2e103a32db4e198524a2e9ed8f35b4.r2.dev/a2d78609-5b4a-455f-a406-b300bd1a74e4/id-preview-6b2cb7a4--39708a3f-1bb9-43cc-ac75-202989847b5c.lovable.app-1779555584603.png" },
     ],
     links: [
       {
