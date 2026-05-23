@@ -15,7 +15,7 @@ inventory system with race-condition-safe checkout reservations.
 
 ## Live demo
 
-- Preview: <https://id-preview--39708a3f-1bb9-43cc-ac75-202989847b5c.lovable.app>
+- Preview: https://time-hold-stock.lovable.app/
 - Published: (publish from the Lovable editor to assign a stable URL)
 
 The database is seeded with 3 warehouses (Mumbai / Delhi / Bengaluru) and 6
