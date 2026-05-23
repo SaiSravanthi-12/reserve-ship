@@ -14,16 +14,245 @@ export type Database = {
   }
   public: {
     Tables: {
-      [_ in never]: never
+      idempotency_keys: {
+        Row: {
+          created_at: string
+          endpoint: string
+          key: string
+          response_body: Json
+          status_code: number
+        }
+        Insert: {
+          created_at?: string
+          endpoint: string
+          key: string
+          response_body: Json
+          status_code: number
+        }
+        Update: {
+          created_at?: string
+          endpoint?: string
+          key?: string
+          response_body?: Json
+          status_code?: number
+        }
+        Relationships: []
+      }
+      products: {
+        Row: {
+          created_at: string
+          description: string | null
+          id: string
+          name: string
+          price_cents: number
+          sku: string
+        }
+        Insert: {
+          created_at?: string
+          description?: string | null
+          id?: string
+          name: string
+          price_cents?: number
+          sku: string
+        }
+        Update: {
+          created_at?: string
+          description?: string | null
+          id?: string
+          name?: string
+          price_cents?: number
+          sku?: string
+        }
+        Relationships: []
+      }
+      reservations: {
+        Row: {
+          created_at: string
+          expires_at: string
+          id: string
+          idempotency_key: string | null
+          product_id: string
+          quantity: number
+          status: Database["public"]["Enums"]["reservation_status"]
+          updated_at: string
+          warehouse_id: string
+        }
+        Insert: {
+          created_at?: string
+          expires_at: string
+          id?: string
+          idempotency_key?: string | null
+          product_id: string
+          quantity: number
+          status?: Database["public"]["Enums"]["reservation_status"]
+          updated_at?: string
+          warehouse_id: string
+        }
+        Update: {
+          created_at?: string
+          expires_at?: string
+          id?: string
+          idempotency_key?: string | null
+          product_id?: string
+          quantity?: number
+          status?: Database["public"]["Enums"]["reservation_status"]
+          updated_at?: string
+          warehouse_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "reservations_product_id_fkey"
+            columns: ["product_id"]
+            isOneToOne: false
+            referencedRelation: "products"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "reservations_warehouse_id_fkey"
+            columns: ["warehouse_id"]
+            isOneToOne: false
+            referencedRelation: "warehouses"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      stock: {
+        Row: {
+          id: string
+          product_id: string
+          reserved_units: number
+          total_units: number
+          updated_at: string
+          warehouse_id: string
+        }
+        Insert: {
+          id?: string
+          product_id: string
+          reserved_units?: number
+          total_units?: number
+          updated_at?: string
+          warehouse_id: string
+        }
+        Update: {
+          id?: string
+          product_id?: string
+          reserved_units?: number
+          total_units?: number
+          updated_at?: string
+          warehouse_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "stock_product_id_fkey"
+            columns: ["product_id"]
+            isOneToOne: false
+            referencedRelation: "products"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "stock_warehouse_id_fkey"
+            columns: ["warehouse_id"]
+            isOneToOne: false
+            referencedRelation: "warehouses"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      warehouses: {
+        Row: {
+          code: string
+          created_at: string
+          id: string
+          name: string
+        }
+        Insert: {
+          code: string
+          created_at?: string
+          id?: string
+          name: string
+        }
+        Update: {
+          code?: string
+          created_at?: string
+          id?: string
+          name?: string
+        }
+        Relationships: []
+      }
     }
     Views: {
       [_ in never]: never
     }
     Functions: {
-      [_ in never]: never
+      confirm_reservation: {
+        Args: { p_id: string }
+        Returns: {
+          created_at: string
+          expires_at: string
+          id: string
+          idempotency_key: string | null
+          product_id: string
+          quantity: number
+          status: Database["public"]["Enums"]["reservation_status"]
+          updated_at: string
+          warehouse_id: string
+        }
+        SetofOptions: {
+          from: "*"
+          to: "reservations"
+          isOneToOne: true
+          isSetofReturn: false
+        }
+      }
+      expire_stale_reservations: { Args: never; Returns: number }
+      release_reservation: {
+        Args: { p_id: string }
+        Returns: {
+          created_at: string
+          expires_at: string
+          id: string
+          idempotency_key: string | null
+          product_id: string
+          quantity: number
+          status: Database["public"]["Enums"]["reservation_status"]
+          updated_at: string
+          warehouse_id: string
+        }
+        SetofOptions: {
+          from: "*"
+          to: "reservations"
+          isOneToOne: true
+          isSetofReturn: false
+        }
+      }
+      try_reserve_stock: {
+        Args: {
+          p_product_id: string
+          p_quantity: number
+          p_ttl_seconds?: number
+          p_warehouse_id: string
+        }
+        Returns: {
+          created_at: string
+          expires_at: string
+          id: string
+          idempotency_key: string | null
+          product_id: string
+          quantity: number
+          status: Database["public"]["Enums"]["reservation_status"]
+          updated_at: string
+          warehouse_id: string
+        }
+        SetofOptions: {
+          from: "*"
+          to: "reservations"
+          isOneToOne: true
+          isSetofReturn: false
+        }
+      }
     }
     Enums: {
-      [_ in never]: never
+      reservation_status: "pending" | "confirmed" | "released" | "expired"
     }
     CompositeTypes: {
       [_ in never]: never
@@ -150,6 +379,8 @@ export type CompositeTypes<
 
 export const Constants = {
   public: {
-    Enums: {},
+    Enums: {
+      reservation_status: ["pending", "confirmed", "released", "expired"],
+    },
   },
 } as const
