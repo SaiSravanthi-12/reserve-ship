@@ -10,33 +10,141 @@
 
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as IndexRouteImport } from './routes/index'
+import { Route as CheckoutIdRouteImport } from './routes/checkout.$id'
+import { Route as ApiWarehousesRouteImport } from './routes/api/warehouses'
+import { Route as ApiReservationsRouteImport } from './routes/api/reservations'
+import { Route as ApiProductsRouteImport } from './routes/api/products'
+import { Route as ApiReservationsIdRouteImport } from './routes/api/reservations.$id'
+import { Route as ApiPublicExpireReservationsRouteImport } from './routes/api/public/expire-reservations'
+import { Route as ApiReservationsIdReleaseRouteImport } from './routes/api/reservations.$id.release'
+import { Route as ApiReservationsIdConfirmRouteImport } from './routes/api/reservations.$id.confirm'
 
 const IndexRoute = IndexRouteImport.update({
   id: '/',
   path: '/',
   getParentRoute: () => rootRouteImport,
 } as any)
+const CheckoutIdRoute = CheckoutIdRouteImport.update({
+  id: '/checkout/$id',
+  path: '/checkout/$id',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ApiWarehousesRoute = ApiWarehousesRouteImport.update({
+  id: '/api/warehouses',
+  path: '/api/warehouses',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ApiReservationsRoute = ApiReservationsRouteImport.update({
+  id: '/api/reservations',
+  path: '/api/reservations',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ApiProductsRoute = ApiProductsRouteImport.update({
+  id: '/api/products',
+  path: '/api/products',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ApiReservationsIdRoute = ApiReservationsIdRouteImport.update({
+  id: '/$id',
+  path: '/$id',
+  getParentRoute: () => ApiReservationsRoute,
+} as any)
+const ApiPublicExpireReservationsRoute =
+  ApiPublicExpireReservationsRouteImport.update({
+    id: '/api/public/expire-reservations',
+    path: '/api/public/expire-reservations',
+    getParentRoute: () => rootRouteImport,
+  } as any)
+const ApiReservationsIdReleaseRoute =
+  ApiReservationsIdReleaseRouteImport.update({
+    id: '/release',
+    path: '/release',
+    getParentRoute: () => ApiReservationsIdRoute,
+  } as any)
+const ApiReservationsIdConfirmRoute =
+  ApiReservationsIdConfirmRouteImport.update({
+    id: '/confirm',
+    path: '/confirm',
+    getParentRoute: () => ApiReservationsIdRoute,
+  } as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
+  '/api/products': typeof ApiProductsRoute
+  '/api/reservations': typeof ApiReservationsRouteWithChildren
+  '/api/warehouses': typeof ApiWarehousesRoute
+  '/checkout/$id': typeof CheckoutIdRoute
+  '/api/public/expire-reservations': typeof ApiPublicExpireReservationsRoute
+  '/api/reservations/$id': typeof ApiReservationsIdRouteWithChildren
+  '/api/reservations/$id/confirm': typeof ApiReservationsIdConfirmRoute
+  '/api/reservations/$id/release': typeof ApiReservationsIdReleaseRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
+  '/api/products': typeof ApiProductsRoute
+  '/api/reservations': typeof ApiReservationsRouteWithChildren
+  '/api/warehouses': typeof ApiWarehousesRoute
+  '/checkout/$id': typeof CheckoutIdRoute
+  '/api/public/expire-reservations': typeof ApiPublicExpireReservationsRoute
+  '/api/reservations/$id': typeof ApiReservationsIdRouteWithChildren
+  '/api/reservations/$id/confirm': typeof ApiReservationsIdConfirmRoute
+  '/api/reservations/$id/release': typeof ApiReservationsIdReleaseRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
+  '/api/products': typeof ApiProductsRoute
+  '/api/reservations': typeof ApiReservationsRouteWithChildren
+  '/api/warehouses': typeof ApiWarehousesRoute
+  '/checkout/$id': typeof CheckoutIdRoute
+  '/api/public/expire-reservations': typeof ApiPublicExpireReservationsRoute
+  '/api/reservations/$id': typeof ApiReservationsIdRouteWithChildren
+  '/api/reservations/$id/confirm': typeof ApiReservationsIdConfirmRoute
+  '/api/reservations/$id/release': typeof ApiReservationsIdReleaseRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/'
+  fullPaths:
+    | '/'
+    | '/api/products'
+    | '/api/reservations'
+    | '/api/warehouses'
+    | '/checkout/$id'
+    | '/api/public/expire-reservations'
+    | '/api/reservations/$id'
+    | '/api/reservations/$id/confirm'
+    | '/api/reservations/$id/release'
   fileRoutesByTo: FileRoutesByTo
-  to: '/'
-  id: '__root__' | '/'
+  to:
+    | '/'
+    | '/api/products'
+    | '/api/reservations'
+    | '/api/warehouses'
+    | '/checkout/$id'
+    | '/api/public/expire-reservations'
+    | '/api/reservations/$id'
+    | '/api/reservations/$id/confirm'
+    | '/api/reservations/$id/release'
+  id:
+    | '__root__'
+    | '/'
+    | '/api/products'
+    | '/api/reservations'
+    | '/api/warehouses'
+    | '/checkout/$id'
+    | '/api/public/expire-reservations'
+    | '/api/reservations/$id'
+    | '/api/reservations/$id/confirm'
+    | '/api/reservations/$id/release'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
+  ApiProductsRoute: typeof ApiProductsRoute
+  ApiReservationsRoute: typeof ApiReservationsRouteWithChildren
+  ApiWarehousesRoute: typeof ApiWarehousesRoute
+  CheckoutIdRoute: typeof CheckoutIdRoute
+  ApiPublicExpireReservationsRoute: typeof ApiPublicExpireReservationsRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -48,22 +156,98 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof IndexRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/checkout/$id': {
+      id: '/checkout/$id'
+      path: '/checkout/$id'
+      fullPath: '/checkout/$id'
+      preLoaderRoute: typeof CheckoutIdRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/api/warehouses': {
+      id: '/api/warehouses'
+      path: '/api/warehouses'
+      fullPath: '/api/warehouses'
+      preLoaderRoute: typeof ApiWarehousesRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/api/reservations': {
+      id: '/api/reservations'
+      path: '/api/reservations'
+      fullPath: '/api/reservations'
+      preLoaderRoute: typeof ApiReservationsRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/api/products': {
+      id: '/api/products'
+      path: '/api/products'
+      fullPath: '/api/products'
+      preLoaderRoute: typeof ApiProductsRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/api/reservations/$id': {
+      id: '/api/reservations/$id'
+      path: '/$id'
+      fullPath: '/api/reservations/$id'
+      preLoaderRoute: typeof ApiReservationsIdRouteImport
+      parentRoute: typeof ApiReservationsRoute
+    }
+    '/api/public/expire-reservations': {
+      id: '/api/public/expire-reservations'
+      path: '/api/public/expire-reservations'
+      fullPath: '/api/public/expire-reservations'
+      preLoaderRoute: typeof ApiPublicExpireReservationsRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/api/reservations/$id/release': {
+      id: '/api/reservations/$id/release'
+      path: '/release'
+      fullPath: '/api/reservations/$id/release'
+      preLoaderRoute: typeof ApiReservationsIdReleaseRouteImport
+      parentRoute: typeof ApiReservationsIdRoute
+    }
+    '/api/reservations/$id/confirm': {
+      id: '/api/reservations/$id/confirm'
+      path: '/confirm'
+      fullPath: '/api/reservations/$id/confirm'
+      preLoaderRoute: typeof ApiReservationsIdConfirmRouteImport
+      parentRoute: typeof ApiReservationsIdRoute
+    }
   }
 }
 
+interface ApiReservationsIdRouteChildren {
+  ApiReservationsIdConfirmRoute: typeof ApiReservationsIdConfirmRoute
+  ApiReservationsIdReleaseRoute: typeof ApiReservationsIdReleaseRoute
+}
+
+const ApiReservationsIdRouteChildren: ApiReservationsIdRouteChildren = {
+  ApiReservationsIdConfirmRoute: ApiReservationsIdConfirmRoute,
+  ApiReservationsIdReleaseRoute: ApiReservationsIdReleaseRoute,
+}
+
+const ApiReservationsIdRouteWithChildren =
+  ApiReservationsIdRoute._addFileChildren(ApiReservationsIdRouteChildren)
+
+interface ApiReservationsRouteChildren {
+  ApiReservationsIdRoute: typeof ApiReservationsIdRouteWithChildren
+}
+
+const ApiReservationsRouteChildren: ApiReservationsRouteChildren = {
+  ApiReservationsIdRoute: ApiReservationsIdRouteWithChildren,
+}
+
+const ApiReservationsRouteWithChildren = ApiReservationsRoute._addFileChildren(
+  ApiReservationsRouteChildren,
+)
+
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
+  ApiProductsRoute: ApiProductsRoute,
+  ApiReservationsRoute: ApiReservationsRouteWithChildren,
+  ApiWarehousesRoute: ApiWarehousesRoute,
+  CheckoutIdRoute: CheckoutIdRoute,
+  ApiPublicExpireReservationsRoute: ApiPublicExpireReservationsRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
   ._addFileTypes<FileRouteTypes>()
-
-import type { getRouter } from './router.tsx'
-import type { startInstance } from './start.ts'
-declare module '@tanstack/react-start' {
-  interface Register {
-    ssr: true
-    router: Awaited<ReturnType<typeof getRouter>>
-    config: Awaited<ReturnType<typeof startInstance.getOptions>>
-  }
-}
