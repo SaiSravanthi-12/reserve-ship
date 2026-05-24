@@ -19,6 +19,7 @@ export type Database = {
           created_at: string
           endpoint: string
           key: string
+          request_fingerprint: string | null
           response_body: Json
           status_code: number
         }
@@ -26,6 +27,7 @@ export type Database = {
           created_at?: string
           endpoint: string
           key: string
+          request_fingerprint?: string | null
           response_body: Json
           status_code: number
         }
@@ -33,6 +35,7 @@ export type Database = {
           created_at?: string
           endpoint?: string
           key?: string
+          request_fingerprint?: string | null
           response_body?: Json
           status_code?: number
         }
