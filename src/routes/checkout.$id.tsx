@@ -4,6 +4,7 @@ import { useEffect, useState } from "react";
 import {
   ApiError,
   confirmReservation,
+  createReservation,
   fetchReservation,
   releaseReservation,
 } from "@/lib/api";
@@ -12,7 +13,8 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { toast } from "sonner";
 import { Toaster } from "@/components/ui/sonner";
-import { ArrowLeft, CheckCircle2, XCircle, Clock } from "lucide-react";
+import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
+import { ArrowLeft, CheckCircle2, XCircle, Clock, AlertTriangle, RotateCw } from "lucide-react";
 
 export const Route = createFileRoute("/checkout/$id")({
   head: ({ params }) => ({
@@ -86,10 +88,17 @@ function CheckoutPage() {
     },
     onError: (err: unknown) => {
       if (err instanceof ApiError && err.status === 410) {
-        toast.error("Reservation expired before payment could be confirmed.");
+        toast.error("Reservation expired", {
+          description: "The 10-minute hold elapsed before payment was confirmed.",
+        });
+        qc.invalidateQueries({ queryKey: ["reservation", id] });
+      } else if (err instanceof ApiError && err.status === 409) {
+        toast.error("Cannot confirm", {
+          description: "This reservation isn't in a confirmable state anymore.",
+        });
         qc.invalidateQueries({ queryKey: ["reservation", id] });
       } else {
-        toast.error((err as Error).message);
+        toast.error("Confirmation failed", { description: (err as Error).message });
       }
     },
   });
@@ -102,6 +111,31 @@ function CheckoutPage() {
       qc.invalidateQueries({ queryKey: ["products"] });
     },
     onError: (err: unknown) => toast.error((err as Error).message),
+  });
+
+  const reReserve = useMutation({
+    mutationFn: () => {
+      if (!data?.product || !data?.warehouse) throw new Error("Missing details");
+      return createReservation({
+        product_id: data.product.id,
+        warehouse_id: data.warehouse.id,
+        quantity: res?.quantity ?? 1,
+      });
+    },
+    onSuccess: (r) => {
+      toast.success("New reservation created");
+      qc.invalidateQueries({ queryKey: ["products"] });
+      navigate({ to: "/checkout/$id", params: { id: r.id } });
+    },
+    onError: (err: unknown) => {
+      if (err instanceof ApiError && err.status === 409) {
+        toast.error("Out of stock", {
+          description: "Someone else grabbed the last unit. Try a different warehouse.",
+        });
+      } else {
+        toast.error("Could not re-reserve", { description: (err as Error).message });
+      }
+    },
   });
 
   return (
@@ -194,11 +228,55 @@ function CheckoutPage() {
               )}
 
               {res.status !== "pending" && (
-                <div className="flex gap-3">
-                  <Button onClick={() => navigate({ to: "/" })} className="flex-1">
-                    Back to products
-                  </Button>
-                </div>
+                <>
+                  {res.status === "expired" && (
+                    <Alert variant="destructive">
+                      <AlertTriangle className="h-4 w-4" />
+                      <AlertTitle>Reservation expired</AlertTitle>
+                      <AlertDescription>
+                        The 10-minute hold elapsed and the units were returned to inventory.
+                        You can try to grab them again — first come, first served.
+                      </AlertDescription>
+                    </Alert>
+                  )}
+                  {res.status === "released" && (
+                    <Alert>
+                      <AlertTriangle className="h-4 w-4" />
+                      <AlertTitle>Reservation released</AlertTitle>
+                      <AlertDescription>
+                        You cancelled this hold. Units are back in the available pool.
+                      </AlertDescription>
+                    </Alert>
+                  )}
+                  {res.status === "confirmed" && (
+                    <Alert>
+                      <CheckCircle2 className="h-4 w-4" />
+                      <AlertTitle>Order confirmed</AlertTitle>
+                      <AlertDescription>
+                        Stock has been decremented and the reservation is finalized.
+                      </AlertDescription>
+                    </Alert>
+                  )}
+                  <div className="flex gap-3">
+                    {(res.status === "expired" || res.status === "released") && (
+                      <Button
+                        className="flex-1"
+                        onClick={() => reReserve.mutate()}
+                        disabled={reReserve.isPending}
+                      >
+                        <RotateCw className={`h-4 w-4 mr-2 ${reReserve.isPending ? "animate-spin" : ""}`} />
+                        {reReserve.isPending ? "Reserving…" : "Reserve again"}
+                      </Button>
+                    )}
+                    <Button
+                      onClick={() => navigate({ to: "/inventory" })}
+                      variant={res.status === "confirmed" ? "default" : "outline"}
+                      className="flex-1"
+                    >
+                      Back to products
+                    </Button>
+                  </div>
+                </>
               )}
             </CardContent>
           </Card>

@@ -125,10 +125,20 @@ function WarehouseRow({ productId, stock }: { productId: string; stock: StockEnt
     },
     onError: (err: unknown) => {
       if (err instanceof ApiError && err.status === 409) {
-        toast.error("Not enough stock available right now.");
         qc.invalidateQueries({ queryKey: ["products"] });
+        toast.error("Out of stock", {
+          description: `${stock.warehouse.name} has no units left. Stock has been refreshed.`,
+          action: {
+            label: "Retry",
+            onClick: () => reserve.mutate(),
+          },
+          duration: 8000,
+        });
       } else {
-        toast.error((err as Error).message);
+        toast.error("Reservation failed", {
+          description: (err as Error).message,
+          action: { label: "Retry", onClick: () => reserve.mutate() },
+        });
       }
     },
   });
