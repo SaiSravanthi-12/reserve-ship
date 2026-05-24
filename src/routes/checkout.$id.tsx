@@ -113,6 +113,31 @@ function CheckoutPage() {
     onError: (err: unknown) => toast.error((err as Error).message),
   });
 
+  const reReserve = useMutation({
+    mutationFn: () => {
+      if (!data?.product || !data?.warehouse) throw new Error("Missing details");
+      return createReservation({
+        product_id: data.product.id,
+        warehouse_id: data.warehouse.id,
+        quantity: res?.quantity ?? 1,
+      });
+    },
+    onSuccess: (r) => {
+      toast.success("New reservation created");
+      qc.invalidateQueries({ queryKey: ["products"] });
+      navigate({ to: "/checkout/$id", params: { id: r.reservation.id } });
+    },
+    onError: (err: unknown) => {
+      if (err instanceof ApiError && err.status === 409) {
+        toast.error("Out of stock", {
+          description: "Someone else grabbed the last unit. Try a different warehouse.",
+        });
+      } else {
+        toast.error("Could not re-reserve", { description: (err as Error).message });
+      }
+    },
+  });
+
   return (
     <div className="min-h-screen bg-background text-foreground">
       <Toaster richColors position="top-right" />
