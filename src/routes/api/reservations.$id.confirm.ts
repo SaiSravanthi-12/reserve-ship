@@ -1,6 +1,6 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { supabaseAdmin } from "@/integrations/supabase/client.server";
-import { getIdempotent, json, saveIdempotent } from "@/lib/reservations.server";
+import { json, lookupIdempotent, saveIdempotent } from "@/lib/reservations.server";
 
 export const Route = createFileRoute("/api/reservations/$id/confirm")({
   server: {
@@ -10,8 +10,14 @@ export const Route = createFileRoute("/api/reservations/$id/confirm")({
         const endpoint = `POST /api/reservations/${id}/confirm`;
         const idemKey = request.headers.get("idempotency-key");
 
-        const cached = await getIdempotent(endpoint, idemKey);
-        if (cached) {
+        // Confirm has no body — fingerprint is just the reservation id so the
+        // same key can't be reused across different reservations.
+        const fp = `confirm:${id}`;
+        const cached = await lookupIdempotent(endpoint, idemKey, fp);
+        if (cached.kind === "conflict") {
+          return json({ error: "idempotency_key_reused" }, 422);
+        }
+        if (cached.kind === "replay") {
           return json(cached.response_body, cached.status_code, {
             "idempotent-replay": "true",
           });
@@ -25,7 +31,8 @@ export const Route = createFileRoute("/api/reservations/$id/confirm")({
           const msg = error.message || "";
           if (msg.includes("expired")) {
             const body = { error: "reservation_expired" };
-            await saveIdempotent(endpoint, idemKey, 410, body);
+            const w = await saveIdempotent(endpoint, idemKey, fp, 410, body);
+            if (w) return json(w.response_body, w.status_code);
             return json(body, 410);
           }
           if (msg.includes("not_found")) {
@@ -39,7 +46,8 @@ export const Route = createFileRoute("/api/reservations/$id/confirm")({
         }
 
         const body = { reservation: data };
-        await saveIdempotent(endpoint, idemKey, 200, body);
+        const w = await saveIdempotent(endpoint, idemKey, fp, 200, body);
+        if (w) return json(w.response_body, w.status_code);
         return json(body, 200);
       },
     },
