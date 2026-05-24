@@ -125,7 +125,7 @@ function CheckoutPage() {
     onSuccess: (r) => {
       toast.success("New reservation created");
       qc.invalidateQueries({ queryKey: ["products"] });
-      navigate({ to: "/checkout/$id", params: { id: r.reservation.id } });
+      navigate({ to: "/checkout/$id", params: { id: r.id } });
     },
     onError: (err: unknown) => {
       if (err instanceof ApiError && err.status === 409) {
