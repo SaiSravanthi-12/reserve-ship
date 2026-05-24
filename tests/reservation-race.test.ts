@@ -64,8 +64,8 @@ afterAll(async () => {
 
 test("two concurrent reservations for the last unit → exactly one succeeds", async () => {
   // Two independent connections = genuine concurrency at the DB layer.
-  const c1 = new Client({ connectionString: DB_URL });
-  const c2 = new Client({ connectionString: DB_URL });
+  const c1 = newClient();
+  const c2 = newClient();
   await Promise.all([c1.connect(), c2.connect()]);
 
   try {
