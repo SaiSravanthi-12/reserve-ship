@@ -4,6 +4,7 @@ import { useEffect, useState } from "react";
 import {
   ApiError,
   confirmReservation,
+  createReservation,
   fetchReservation,
   releaseReservation,
 } from "@/lib/api";
@@ -12,7 +13,8 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { toast } from "sonner";
 import { Toaster } from "@/components/ui/sonner";
-import { ArrowLeft, CheckCircle2, XCircle, Clock } from "lucide-react";
+import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
+import { ArrowLeft, CheckCircle2, XCircle, Clock, AlertTriangle, RotateCw } from "lucide-react";
 
 export const Route = createFileRoute("/checkout/$id")({
   head: ({ params }) => ({
