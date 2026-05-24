@@ -9,6 +9,7 @@
 // Additionally, you should also exclude this file from your linter and/or formatter to prevent it from being checked or modified.
 
 import { Route as rootRouteImport } from './routes/__root'
+import { Route as InventoryRouteImport } from './routes/inventory'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as CheckoutIdRouteImport } from './routes/checkout.$id'
 import { Route as ApiWarehousesRouteImport } from './routes/api/warehouses'
@@ -19,6 +20,11 @@ import { Route as ApiPublicExpireReservationsRouteImport } from './routes/api/pu
 import { Route as ApiReservationsIdReleaseRouteImport } from './routes/api/reservations.$id.release'
 import { Route as ApiReservationsIdConfirmRouteImport } from './routes/api/reservations.$id.confirm'
 
+const InventoryRoute = InventoryRouteImport.update({
+  id: '/inventory',
+  path: '/inventory',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const IndexRoute = IndexRouteImport.update({
   id: '/',
   path: '/',
@@ -70,6 +76,7 @@ const ApiReservationsIdConfirmRoute =
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
+  '/inventory': typeof InventoryRoute
   '/api/products': typeof ApiProductsRoute
   '/api/reservations': typeof ApiReservationsRouteWithChildren
   '/api/warehouses': typeof ApiWarehousesRoute
@@ -81,6 +88,7 @@ export interface FileRoutesByFullPath {
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
+  '/inventory': typeof InventoryRoute
   '/api/products': typeof ApiProductsRoute
   '/api/reservations': typeof ApiReservationsRouteWithChildren
   '/api/warehouses': typeof ApiWarehousesRoute
@@ -93,6 +101,7 @@ export interface FileRoutesByTo {
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
+  '/inventory': typeof InventoryRoute
   '/api/products': typeof ApiProductsRoute
   '/api/reservations': typeof ApiReservationsRouteWithChildren
   '/api/warehouses': typeof ApiWarehousesRoute
@@ -106,6 +115,7 @@ export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
   fullPaths:
     | '/'
+    | '/inventory'
     | '/api/products'
     | '/api/reservations'
     | '/api/warehouses'
@@ -117,6 +127,7 @@ export interface FileRouteTypes {
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
+    | '/inventory'
     | '/api/products'
     | '/api/reservations'
     | '/api/warehouses'
@@ -128,6 +139,7 @@ export interface FileRouteTypes {
   id:
     | '__root__'
     | '/'
+    | '/inventory'
     | '/api/products'
     | '/api/reservations'
     | '/api/warehouses'
@@ -140,6 +152,7 @@ export interface FileRouteTypes {
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
+  InventoryRoute: typeof InventoryRoute
   ApiProductsRoute: typeof ApiProductsRoute
   ApiReservationsRoute: typeof ApiReservationsRouteWithChildren
   ApiWarehousesRoute: typeof ApiWarehousesRoute
@@ -149,6 +162,13 @@ export interface RootRouteChildren {
 
 declare module '@tanstack/react-router' {
   interface FileRoutesByPath {
+    '/inventory': {
+      id: '/inventory'
+      path: '/inventory'
+      fullPath: '/inventory'
+      preLoaderRoute: typeof InventoryRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/': {
       id: '/'
       path: '/'
@@ -242,6 +262,7 @@ const ApiReservationsRouteWithChildren = ApiReservationsRoute._addFileChildren(
 
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
+  InventoryRoute: InventoryRoute,
   ApiProductsRoute: ApiProductsRoute,
   ApiReservationsRoute: ApiReservationsRouteWithChildren,
   ApiWarehousesRoute: ApiWarehousesRoute,
@@ -251,13 +272,3 @@ const rootRouteChildren: RootRouteChildren = {
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
   ._addFileTypes<FileRouteTypes>()
-
-import type { getRouter } from './router.tsx'
-import type { startInstance } from './start.ts'
-declare module '@tanstack/react-start' {
-  interface Register {
-    ssr: true
-    router: Awaited<ReturnType<typeof getRouter>>
-    config: Awaited<ReturnType<typeof startInstance.getOptions>>
-  }
-}
