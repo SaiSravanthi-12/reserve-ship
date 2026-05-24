@@ -56,10 +56,15 @@ beforeAll(async () => {
 
 afterAll(async () => {
   if (!productId) return;
-  await exec(`delete from public.reservations where product_id = $1`, [productId]);
-  await exec(`delete from public.stock where product_id = $1`, [productId]);
-  await exec(`delete from public.products where id = $1`, [productId]);
-  await exec(`delete from public.warehouses where id = $1`, [warehouseId]);
+  // Best-effort cleanup — some roles can't DELETE from reservations directly;
+  // those rows are harmless test data and won't affect anything.
+  const safe = async (sql: string, params: unknown[]) => {
+    try { await exec(sql, params); } catch (e) { console.warn("[cleanup]", (e as Error).message); }
+  };
+  await safe(`delete from public.reservations where product_id = $1`, [productId]);
+  await safe(`delete from public.stock where product_id = $1`, [productId]);
+  await safe(`delete from public.products where id = $1`, [productId]);
+  await safe(`delete from public.warehouses where id = $1`, [warehouseId]);
 });
 
 test("two concurrent reservations for the last unit → exactly one succeeds", async () => {
