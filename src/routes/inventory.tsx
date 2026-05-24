@@ -9,7 +9,7 @@ import { toast } from "sonner";
 import { Toaster } from "@/components/ui/sonner";
 import { Package, Warehouse as WarehouseIcon } from "lucide-react";
 
-export const Route = createFileRoute("/")({
+export const Route = createFileRoute("/inventory")({
   head: () => ({
     meta: [
       { title: "Allo — Inventory & Reservations" },

@@ -9,7 +9,7 @@
 // Additionally, you should also exclude this file from your linter and/or formatter to prevent it from being checked or modified.
 
 import { Route as rootRouteImport } from './routes/__root'
-import { Route as IndexRouteImport } from './routes/index'
+import { Route as InventoryRouteImport } from './routes/inventory'
 import { Route as CheckoutIdRouteImport } from './routes/checkout.$id'
 import { Route as ApiWarehousesRouteImport } from './routes/api/warehouses'
 import { Route as ApiReservationsRouteImport } from './routes/api/reservations'
@@ -19,9 +19,9 @@ import { Route as ApiPublicExpireReservationsRouteImport } from './routes/api/pu
 import { Route as ApiReservationsIdReleaseRouteImport } from './routes/api/reservations.$id.release'
 import { Route as ApiReservationsIdConfirmRouteImport } from './routes/api/reservations.$id.confirm'
 
-const IndexRoute = IndexRouteImport.update({
-  id: '/',
-  path: '/',
+const InventoryRoute = InventoryRouteImport.update({
+  id: '/inventory',
+  path: '/inventory',
   getParentRoute: () => rootRouteImport,
 } as any)
 const CheckoutIdRoute = CheckoutIdRouteImport.update({
@@ -69,7 +69,7 @@ const ApiReservationsIdConfirmRoute =
   } as any)
 
 export interface FileRoutesByFullPath {
-  '/': typeof IndexRoute
+  '/inventory': typeof InventoryRoute
   '/api/products': typeof ApiProductsRoute
   '/api/reservations': typeof ApiReservationsRouteWithChildren
   '/api/warehouses': typeof ApiWarehousesRoute
@@ -80,7 +80,7 @@ export interface FileRoutesByFullPath {
   '/api/reservations/$id/release': typeof ApiReservationsIdReleaseRoute
 }
 export interface FileRoutesByTo {
-  '/': typeof IndexRoute
+  '/inventory': typeof InventoryRoute
   '/api/products': typeof ApiProductsRoute
   '/api/reservations': typeof ApiReservationsRouteWithChildren
   '/api/warehouses': typeof ApiWarehousesRoute
@@ -92,7 +92,7 @@ export interface FileRoutesByTo {
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
-  '/': typeof IndexRoute
+  '/inventory': typeof InventoryRoute
   '/api/products': typeof ApiProductsRoute
   '/api/reservations': typeof ApiReservationsRouteWithChildren
   '/api/warehouses': typeof ApiWarehousesRoute
@@ -105,7 +105,7 @@ export interface FileRoutesById {
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
   fullPaths:
-    | '/'
+    | '/inventory'
     | '/api/products'
     | '/api/reservations'
     | '/api/warehouses'
@@ -116,7 +116,7 @@ export interface FileRouteTypes {
     | '/api/reservations/$id/release'
   fileRoutesByTo: FileRoutesByTo
   to:
-    | '/'
+    | '/inventory'
     | '/api/products'
     | '/api/reservations'
     | '/api/warehouses'
@@ -127,7 +127,7 @@ export interface FileRouteTypes {
     | '/api/reservations/$id/release'
   id:
     | '__root__'
-    | '/'
+    | '/inventory'
     | '/api/products'
     | '/api/reservations'
     | '/api/warehouses'
@@ -139,7 +139,7 @@ export interface FileRouteTypes {
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
-  IndexRoute: typeof IndexRoute
+  InventoryRoute: typeof InventoryRoute
   ApiProductsRoute: typeof ApiProductsRoute
   ApiReservationsRoute: typeof ApiReservationsRouteWithChildren
   ApiWarehousesRoute: typeof ApiWarehousesRoute
@@ -149,11 +149,11 @@ export interface RootRouteChildren {
 
 declare module '@tanstack/react-router' {
   interface FileRoutesByPath {
-    '/': {
-      id: '/'
-      path: '/'
-      fullPath: '/'
-      preLoaderRoute: typeof IndexRouteImport
+    '/inventory': {
+      id: '/inventory'
+      path: '/inventory'
+      fullPath: '/inventory'
+      preLoaderRoute: typeof InventoryRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/checkout/$id': {
@@ -241,7 +241,7 @@ const ApiReservationsRouteWithChildren = ApiReservationsRoute._addFileChildren(
 )
 
 const rootRouteChildren: RootRouteChildren = {
-  IndexRoute: IndexRoute,
+  InventoryRoute: InventoryRoute,
   ApiProductsRoute: ApiProductsRoute,
   ApiReservationsRoute: ApiReservationsRouteWithChildren,
   ApiWarehousesRoute: ApiWarehousesRoute,
