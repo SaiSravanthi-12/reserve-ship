@@ -228,11 +228,55 @@ function CheckoutPage() {
               )}
 
               {res.status !== "pending" && (
-                <div className="flex gap-3">
-                  <Button onClick={() => navigate({ to: "/" })} className="flex-1">
-                    Back to products
-                  </Button>
-                </div>
+                <>
+                  {res.status === "expired" && (
+                    <Alert variant="destructive">
+                      <AlertTriangle className="h-4 w-4" />
+                      <AlertTitle>Reservation expired</AlertTitle>
+                      <AlertDescription>
+                        The 10-minute hold elapsed and the units were returned to inventory.
+                        You can try to grab them again — first come, first served.
+                      </AlertDescription>
+                    </Alert>
+                  )}
+                  {res.status === "released" && (
+                    <Alert>
+                      <AlertTriangle className="h-4 w-4" />
+                      <AlertTitle>Reservation released</AlertTitle>
+                      <AlertDescription>
+                        You cancelled this hold. Units are back in the available pool.
+                      </AlertDescription>
+                    </Alert>
+                  )}
+                  {res.status === "confirmed" && (
+                    <Alert>
+                      <CheckCircle2 className="h-4 w-4" />
+                      <AlertTitle>Order confirmed</AlertTitle>
+                      <AlertDescription>
+                        Stock has been decremented and the reservation is finalized.
+                      </AlertDescription>
+                    </Alert>
+                  )}
+                  <div className="flex gap-3">
+                    {(res.status === "expired" || res.status === "released") && (
+                      <Button
+                        className="flex-1"
+                        onClick={() => reReserve.mutate()}
+                        disabled={reReserve.isPending}
+                      >
+                        <RotateCw className={`h-4 w-4 mr-2 ${reReserve.isPending ? "animate-spin" : ""}`} />
+                        {reReserve.isPending ? "Reserving…" : "Reserve again"}
+                      </Button>
+                    )}
+                    <Button
+                      onClick={() => navigate({ to: "/inventory" })}
+                      variant={res.status === "confirmed" ? "default" : "outline"}
+                      className="flex-1"
+                    >
+                      Back to products
+                    </Button>
+                  </div>
+                </>
               )}
             </CardContent>
           </Card>
