@@ -32,12 +32,14 @@ function LandingPage() {
             <Boxes className="h-5 w-5" />
             <span className="font-semibold tracking-tight">Allo Inventory</span>
           </div>
-          <Link
-            to="/inventory"
-            className="text-sm text-muted-foreground hover:text-foreground transition-colors"
-          >
-            Inventory →
-          </Link>
+          <nav className="flex items-center gap-5 text-sm text-muted-foreground">
+            <Link to="/admin" className="hover:text-foreground transition-colors">
+              Admin
+            </Link>
+            <Link to="/inventory" className="hover:text-foreground transition-colors">
+              Inventory →
+            </Link>
+          </nav>
         </div>
       </header>
 
