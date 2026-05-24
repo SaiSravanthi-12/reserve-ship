@@ -16,11 +16,14 @@ if (!DB_URL) {
   throw new Error("SUPABASE_DB_URL must be set to run race tests");
 }
 
+const SSL = { rejectUnauthorized: false };
+const newClient = () => new Client({ connectionString: DB_URL, ssl: SSL });
+
 let productId: string;
 let warehouseId: string;
 
 async function exec<T = any>(sql: string, params: unknown[] = []): Promise<T[]> {
-  const c = new Client({ connectionString: DB_URL });
+  const c = newClient();
   await c.connect();
   try {
     const r = await c.query(sql, params);
