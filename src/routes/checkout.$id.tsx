@@ -88,10 +88,17 @@ function CheckoutPage() {
     },
     onError: (err: unknown) => {
       if (err instanceof ApiError && err.status === 410) {
-        toast.error("Reservation expired before payment could be confirmed.");
+        toast.error("Reservation expired", {
+          description: "The 10-minute hold elapsed before payment was confirmed.",
+        });
+        qc.invalidateQueries({ queryKey: ["reservation", id] });
+      } else if (err instanceof ApiError && err.status === 409) {
+        toast.error("Cannot confirm", {
+          description: "This reservation isn't in a confirmable state anymore.",
+        });
         qc.invalidateQueries({ queryKey: ["reservation", id] });
       } else {
-        toast.error((err as Error).message);
+        toast.error("Confirmation failed", { description: (err as Error).message });
       }
     },
   });
