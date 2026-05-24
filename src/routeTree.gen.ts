@@ -10,6 +10,7 @@
 
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as InventoryRouteImport } from './routes/inventory'
+import { Route as IndexRouteImport } from './routes/index'
 import { Route as CheckoutIdRouteImport } from './routes/checkout.$id'
 import { Route as ApiWarehousesRouteImport } from './routes/api/warehouses'
 import { Route as ApiReservationsRouteImport } from './routes/api/reservations'
@@ -22,6 +23,11 @@ import { Route as ApiReservationsIdConfirmRouteImport } from './routes/api/reser
 const InventoryRoute = InventoryRouteImport.update({
   id: '/inventory',
   path: '/inventory',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const IndexRoute = IndexRouteImport.update({
+  id: '/',
+  path: '/',
   getParentRoute: () => rootRouteImport,
 } as any)
 const CheckoutIdRoute = CheckoutIdRouteImport.update({
@@ -69,6 +75,7 @@ const ApiReservationsIdConfirmRoute =
   } as any)
 
 export interface FileRoutesByFullPath {
+  '/': typeof IndexRoute
   '/inventory': typeof InventoryRoute
   '/api/products': typeof ApiProductsRoute
   '/api/reservations': typeof ApiReservationsRouteWithChildren
@@ -80,6 +87,7 @@ export interface FileRoutesByFullPath {
   '/api/reservations/$id/release': typeof ApiReservationsIdReleaseRoute
 }
 export interface FileRoutesByTo {
+  '/': typeof IndexRoute
   '/inventory': typeof InventoryRoute
   '/api/products': typeof ApiProductsRoute
   '/api/reservations': typeof ApiReservationsRouteWithChildren
@@ -92,6 +100,7 @@ export interface FileRoutesByTo {
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
+  '/': typeof IndexRoute
   '/inventory': typeof InventoryRoute
   '/api/products': typeof ApiProductsRoute
   '/api/reservations': typeof ApiReservationsRouteWithChildren
@@ -105,6 +114,7 @@ export interface FileRoutesById {
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
   fullPaths:
+    | '/'
     | '/inventory'
     | '/api/products'
     | '/api/reservations'
@@ -116,6 +126,7 @@ export interface FileRouteTypes {
     | '/api/reservations/$id/release'
   fileRoutesByTo: FileRoutesByTo
   to:
+    | '/'
     | '/inventory'
     | '/api/products'
     | '/api/reservations'
@@ -127,6 +138,7 @@ export interface FileRouteTypes {
     | '/api/reservations/$id/release'
   id:
     | '__root__'
+    | '/'
     | '/inventory'
     | '/api/products'
     | '/api/reservations'
@@ -139,6 +151,7 @@ export interface FileRouteTypes {
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
+  IndexRoute: typeof IndexRoute
   InventoryRoute: typeof InventoryRoute
   ApiProductsRoute: typeof ApiProductsRoute
   ApiReservationsRoute: typeof ApiReservationsRouteWithChildren
@@ -154,6 +167,13 @@ declare module '@tanstack/react-router' {
       path: '/inventory'
       fullPath: '/inventory'
       preLoaderRoute: typeof InventoryRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/': {
+      id: '/'
+      path: '/'
+      fullPath: '/'
+      preLoaderRoute: typeof IndexRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/checkout/$id': {
@@ -241,6 +261,7 @@ const ApiReservationsRouteWithChildren = ApiReservationsRoute._addFileChildren(
 )
 
 const rootRouteChildren: RootRouteChildren = {
+  IndexRoute: IndexRoute,
   InventoryRoute: InventoryRoute,
   ApiProductsRoute: ApiProductsRoute,
   ApiReservationsRoute: ApiReservationsRouteWithChildren,
