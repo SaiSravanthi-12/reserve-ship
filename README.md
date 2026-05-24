@@ -1,12 +1,12 @@
 # Allo — Inventory & Reservations
 
-A take-home implementation of the Allo Engineering exercise: a multi-warehouse
+A take-home implementation of the Allo Engineering exercise: a multi-warehouse An 
 inventory system with race-condition-safe checkout reservations.
 
 > **Stack note.** The brief specified Next.js + Prisma + Supabase. This project
 > was built inside the Lovable platform, which is locked to **TanStack Start
 > (React 19 + Vite, deployed on Cloudflare Workers)** and **Lovable Cloud**
-> (managed Supabase / Postgres). The runtime is different but every requirement
+> (managed Supabase / Postgres). The runtime is different, but every requirement
 > in the brief is implemented: the same Postgres, the same race-safety
 > guarantees, the same HTTP API shape, the same UI flow. See "Mapping to the
 > brief" below for the swap detail.
@@ -16,11 +16,11 @@ inventory system with race-condition-safe checkout reservations.
 ## Live demo
 
 - Preview: https://time-hold-stock.lovable.app/
-- Published: (publish from the Lovable editor to assign a stable URL)
+- Published: (published from the Lovable editor to assign a stable URL)
 
 The database is seeded with 3 warehouses (Mumbai / Delhi / Bengaluru) and 6
 SKUs at varying stock levels. One SKU (`ALLO-BAG-01`) intentionally has only
-1–2 units per warehouse so you can demo the 409 path with two concurrent tabs.
+1–2 units per warehouse so that you can demo the 409 path with two concurrent tabs.
 
 ---
 
@@ -41,7 +41,7 @@ This is a Lovable / Cloudflare project, so the local story is:
    SUPABASE_PUBLISHABLE_KEY=<anon key>
    SUPABASE_SERVICE_ROLE_KEY=<service role key>
    ```
-3. Apply migrations: the SQL that creates the schema, functions and seed lives
+3. Apply migrations: the SQL that creates the schema, functions, and seed lives
    in `supabase/migrations/`. Run them with `supabase db push` (or paste into
    the SQL editor of your Supabase project).
 4. Schedule expiry (production only — see *Expiry mechanism* below).
@@ -136,10 +136,10 @@ Why this is race-safe:
   serializable transactions needed. The check and the decrement happen
   atomically in one statement because the predicate is part of the `UPDATE`.
 
-`confirm_reservation` and `release_reservation` follow the same pattern but
-use `SELECT ... FOR UPDATE` to lock the reservation row first, then validate
-its current status and expiry before mutating. This makes concurrent
-`confirm + release` on the same reservation deterministic — the first one
+`confirm_reservation` and `release_reservation` follow the same pattern, but
+Use `SELECT ... FOR UPDATE` to lock the reservation row first, then validate
+Its current status and expiry before mutating. This makes concurrent
+`confirm + release` on the same reservation, deterministic — the first one
 wins, the second sees a non-`pending` status and is rejected.
 
 ### Why no Redis
@@ -155,7 +155,7 @@ would mean operating two consistency models for the same business invariant
 
 ## Reservation expiry
 
-Three layers of defence so a forgotten reservation never permanently holds
+Three layers of defence, so a forgotten reservation never permanently holds
 stock:
 
 1. **Lazy cleanup on read.** `GET /api/products` and `GET /api/reservations/:id`
@@ -182,8 +182,8 @@ stock:
    under a row lock and refuses (with `expired`) if the TTL has elapsed —
    even if the cron hasn't run yet. The HTTP layer maps that to `410 Gone`.
 
-If I had more time I'd move to a `LISTEN/NOTIFY`-driven worker with a
-heap-ordered priority queue keyed on `expires_at`, so cleanup latency is
+If I had more time, I'd move to a `LISTEN/NOTIFY`-driven worker with a
+heap-ordered priority queue keyed on `expires_at`, so the cleanup latency is
 proportional to the TTL of the soonest-expiring hold rather than 1 minute.
 
 ---
@@ -197,17 +197,17 @@ header (the browser does this automatically with `crypto.randomUUID()`).
 On the server:
 
 1. Look up `(endpoint, key)` in `idempotency_keys`.
-2. If a row exists, replay its cached `status_code` and `response_body`
+2. If a row exists, replay its cached `status_code` and `response_body.`
    verbatim (plus an `Idempotent-Replay: true` header) — **no side effect.**
-3. Otherwise execute the action, then `INSERT` the response into
+3. Otherwise, execute the action, then `INSERT` the response into
    `idempotency_keys` keyed on `(endpoint, key)`.
 
-The key is scoped by endpoint so the same UUID couldn't accidentally satisfy
+The key is scoped by endpoint, so the same UUID couldn't accidentally satisfy
 both a reserve and a confirm. Duplicate-key INSERT failures (a true race on
 the same key) are swallowed — the next read of the cached row wins.
 
-A `(key, endpoint)` `PRIMARY KEY` guarantees uniqueness at the database
-layer, and the table has RLS enabled with no policy so only the server
+A `(key, endpoint)` `PRIMARY KEY` guarantees uniqueness at the database level
+layer, and the table has RLS enabled with no policy, so only the server
 (service role) can read or write it.
 
 ---
@@ -250,23 +250,26 @@ SQL functions go into a Prisma migration unchanged, the route handlers become
 
 ## Trade-offs and what I'd do with more time
 
-- **No auth.** Anyone can create / confirm / release any reservation. The
-  brief doesn't require auth, so I scoped it out. In production I'd attach
+- **No auth.** Anyone can create/confirm/release any reservation. The
+  brief doesn't require auth, so I scoped it out. In production, I'd attach
   reservations to `user_id` and tie confirm/release to the owner via RLS.
 - **No payment integration.** *Confirm purchase* is a button that finalises
-  the reservation. In production it would gate on a Stripe / Razorpay webhook
+  the reservation. In production, it would gate on a Stripe / Razorpay webhook
   rather than a user click.
 - **Per-warehouse only.** A real fulfillment system would let you reserve N
   units across the cheapest combination of warehouses. I kept it single-warehouse
   to match the brief's API shape.
 - **Lazy cleanup runs unconditionally on every list read.** Cheap at this
-  scale, but I'd move it behind an in-process throttle (e.g. once per second)
-  if `/api/products` started getting hammered.
+  scale, but I'd move it behind an in-process throttle (e.g., once per second)
+  If`/api/products` started getting hammered.
 - **Idempotency keys never expire.** I'd add a `created_at`-based TTL (24h is
-  industry standard, e.g. Stripe) and a periodic cleanup so the table
+  industry standard, e.g., Stripe) and a periodic cleanup so the table
   doesn't grow unbounded.
 - **Concurrency is tested by eye, not in code.** I'd add a `k6` or `vitest`
   load test that fires N concurrent reserve requests at a 1-unit SKU and
   asserts exactly 1 succeeds.
 - **No observability.** I'd wire `pg_stat_statements`, structured request
   logging, and per-endpoint error rates before shipping this for real.
+
+
+
